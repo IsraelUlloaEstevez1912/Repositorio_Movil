@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Financiera Profesional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Tabs */
+        .tabs {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-button:hover {
+            background: #f5f5f5;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #667eea;
+        }
+
+        /* Content */
+        .content-area {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        /* Form inputs */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group .helper-text {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        /* Results */
+        .result-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .result-box.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left: 5px solid #4c5fd5;
+        }
+
+        .result-box.secondary {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+        }
+
+        .result-box.success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+        }
+
+        .result-box.danger {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+        }
+
+        .result-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .result-box.primary .result-label {
+            opacity: 0.9;
+        }
+
+        .summary {
+            border-top: 2px solid #e0e0e0;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 0.95em;
+        }
+
+        .summary-row .label {
+            color: #666;
+        }
+
+        .summary-row .value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tab-content.active {
+                grid-template-columns: 1fr;
+            }
+
+            .content-area {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tab-button {
+                padding: 15px 10px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💼 Calculadora Financiera</h1>
+            <p>Herramienta profesional para cálculos de préstamos e inversiones</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('consumo')">
+                    💳 Préstamo Consumo
+                </button>
+                <button class="tab-button" onclick="switchTab('hipoteca')">
+                    🏠 Préstamo Hipotecario
+                </button>
+                <button class="tab-button" onclick="switchTab('inversion')">
+                    📈 Inversiones
+                </button>
+            </div>
+        </div>
+
+        <!-- Préstamo de Consumo -->
+        <div id="consumo" class="tab-content active">
+            <div class="card">
+                <h2>💳 Datos del Préstamo</h2>
+                
+                <div class="form-group">
+                    <label>💰 Monto del Préstamo</label>
+                    <input type="number" id="consumo-monto" value="10000" oninput="calcularConsumo()">
+                    <div class="helper-text" id="consumo-monto-formato">$10,000</div>
+                </div>
+
+                <div class="form-group">
+                    <label>📊 Tasa de Interés Anual (%)</label>
+                    <input type="number" id="consumo-tasa" value="12" step="0.1" oninput="calcularConsumo()">
+                </div>
+
+                <div class="form-group">
+                    <label>📅 Plazo (meses)</label>
+                    <input type="number" id="consumo-plazo" value="12" oninput="calcularConsumo()">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Resultados</h2>
+                
+                <div class="result-box primary">
+                    <div class="result-label">Cuota Mensual</div>
+                    <div class="result-value" id="consumo-cuota">$0.00</div>
+                </div>
+
+                <div class="result-box secondary">
+                    <div class="result-label">Total a Pagar</div>
+                    <div class="result-value" id="consumo-total">$0.00</div>
+                </div>
+
+                <div class="result-box danger">
+                    <div class="result-label">Intereses Totales</div>
+                    <div class="result-value" id="consumo-intereses">$0.00</div>
+                </div>
+
+                <div class="summary">
+                    <div class="summary-row">
+                        <span class="label">Capital</span>
+                        <span class="value" id="consumo-capital">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label">Intereses</span>
+                        <span class="value" id="consumo-intereses-sum">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Préstamo Hipotecario -->
+        <div id="hipoteca" class="tab-content">
+            <div class="card">
+                <h2>🏠 Datos de la Hipoteca</h2>
+                
+                <div class="form-group">
+                    <label>💰 Valor de la Propiedad</label>
+                    <input type="number" id="hipoteca-monto" value="150000" oninput="calcularHipoteca()">
+                    <div class="helper-text" id="hipoteca-monto-formato">$150,000</div>
+                </div>
+
+                <div class="form-group">
+                    <label>💵 Cuota Inicial</label>
+                    <input type="number" id="hipoteca-inicial" value="30000" oninput="calcularHipoteca()">
+                    <div class="helper-text" id="hipoteca-inicial-formato">20% del valor</div>
+                </div>
+
+                <div class="form-group">
+                    <label>📊 Tasa de Interés Anual (%)</label>
+                    <input type="number" id="hipoteca-tasa" value="8" step="0.1" oninput="calcularHipoteca()">
+                </div>
+
+                <div class="form-group">
+                    <label>📅 Plazo (meses)</label>
+                    <input type="number" id="hipoteca-plazo" value="240" oninput="calcularHipoteca()">
+                    <div class="helper-text" id="hipoteca-plazo-formato">20 años</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Resultados</h2>
+                
+                <div class="result-box secondary">
+                    <div class="result-label">Monto a Financiar</div>
+                    <div class="result-value" id="hipoteca-financiar">$0.00</div>
+                </div>
+
+                <div class="result-box primary">
+                    <div class="result-label">Cuota Mensual</div>
+                    <div class="result-value" id="hipoteca-cuota">$0.00</div>
+                </div>
+
+                <div class="result-box secondary">
+                    <div class="result-label">Total a Pagar</div>
+                    <div class="result-value" id="hipoteca-total">$0.00</div>
+                </div>
+
+                <div class="result-box danger">
+                    <div class="result-label">Intereses Totales</div>
+                    <div class="result-value" id="hipoteca-intereses">$0.00</div>
+                </div>
+
+                <div class="summary">
+                    <div class="summary-row">
+                        <span class="label">Cuota Inicial</span>
+                        <span class="value" id="hipoteca-inicial-sum">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label">Capital Financiado</span>
+                        <span class="value" id="hipoteca-financiar-sum">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label">Intereses</span>
+                        <span class="value" id="hipoteca-intereses-sum">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inversiones -->
+        <div id="inversion" class="tab-content">
+            <div class="card">
+                <h2>📈 Datos de la Inversión</h2>
+                
+                <div class="form-group">
+                    <label>💰 Inversión Inicial</label>
+                    <input type="number" id="inversion-inicial" value="5000" oninput="calcularInversion()">
+                    <div class="helper-text" id="inversion-inicial-formato">$5,000</div>
+                </div>
+
+                <div class="form-group">
+                    <label>💵 Aporte Mensual</label>
+                    <input type="number" id="inversion-mensual" value="500" oninput="calcularInversion()">
+                    <div class="helper-text" id="inversion-mensual-formato">$500/mes</div>
+                </div>
+
+                <div class="form-group">
+                    <label>📊 Tasa de Rendimiento Anual (%)</label>
+                    <input type="number" id="inversion-tasa" value="10" step="0.1" oninput="calcularInversion()">
+                </div>
+
+                <div class="form-group">
+                    <label>📅 Plazo (años)</label>
+                    <input type="number" id="inversion-plazo" value="5" oninput="calcularInversion()">
+                    <div class="helper-text" id="inversion-plazo-formato">60 meses</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Resultados</h2>
+                
+                <div class="result-box success">
+                    <div class="result-label">Valor Final de la Inversión</div>
+                    <div class="result-value" id="inversion-final">$0.00</div>
+                </div>
+
+                <div class="result-box secondary">
+                    <div class="result-label">Total Aportado</div>
+                    <div class="result-value" id="inversion-aportado">$0.00</div>
+                </div>
+
+                <div class="result-box success">
+                    <div class="result-label">Ganancias</div>
+                    <div class="result-value" id="inversion-ganancias">$0.00</div>
+                </div>
+
+                <div class="result-box primary">
+                    <div class="result-label">Rendimiento Total</div>
+                    <div class="result-value" id="inversion-rendimiento">0%</div>
+                </div>
+
+                <div class="summary">
+                    <div class="summary-row">
+                        <span class="label">Inversión Inicial</span>
+                        <span class="value" id="inversion-inicial-sum">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label">Aportes Mensuales</span>
+                        <span class="value" id="inversion-aportes-sum">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="label">Intereses Ganados</span>
+                        <span class="value" id="inversion-ganancias-sum">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Calculadora Financiera Profesional • Los resultados son aproximados y tienen fines informativos</p>
+        </div>
+    </div>
+
+    <script>
+        // Función para cambiar de pestaña
+        function switchTab(tabName) {
+            // Ocultar todos los contenidos
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Desactivar todos los botones
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Mostrar el contenido seleccionado
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activar el botón seleccionado
+            event.target.classList.add('active');
+        }
+
+        // Formatear números como moneda
+        function formatCurrency(number) {
+            return '$' + number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        // Calcular Préstamo de Consumo
+        function calcularConsumo() {
+            const monto = parseFloat(document.getElementById('consumo-monto').value) || 0;
+            const tasa = parseFloat(document.getElementById('consumo-tasa').value) || 0;
+            const plazo = parseInt(document.getElementById('consumo-plazo').value) || 0;
+            
+            // Actualizar formato
+            document.getElementById('consumo-monto-formato').textContent = formatCurrency(monto);
+            
+            if (monto > 0 && tasa > 0 && plazo > 0) {
+                const tasaMensual = tasa / 100 / 12;
+                const cuotaMensual = monto * (tasaMensual * Math.pow(1 + tasaMensual, plazo)) / 
+                                    (Math.pow(1 + tasaMensual, plazo) - 1);
+                const totalPagar = cuotaMensual * plazo;
+                const interesTotal = totalPagar - monto;
+                
+                document.getElementById('consumo-cuota').textContent = formatCurrency(cuotaMensual);
+                document.getElementById('consumo-total').textContent = formatCurrency(totalPagar);
+                document.getElementById('consumo-intereses').textContent = formatCurrency(interesTotal);
+                document.getElementById('consumo-capital').textContent = formatCurrency(monto);
+                document.getElementById('consumo-intereses-sum').textContent = formatCurrency(interesTotal);
+            }
+        }
+
+        // Calcular Préstamo Hipotecario
+        function calcularHipoteca() {
+            const monto = parseFloat(document.getElementById('hipoteca-monto').value) || 0;
+            const inicial = parseFloat(document.getElementById('hipoteca-inicial').value) || 0;
+            const tasa = parseFloat(document.getElementById('hipoteca-tasa').value) || 0;
+            const plazo = parseInt(document.getElementById('hipoteca-plazo').value) || 0;
+            
+            // Actualizar formatos
+            document.getElementById('hipoteca-monto-formato').textContent = formatCurrency(monto);
+            const porcentajeInicial = monto > 0 ? ((inicial / monto) * 100).toFixed(1) : 0;
+            document.getElementById('hipoteca-inicial-formato').textContent = porcentajeInicial + '% del valor';
+            document.getElementById('hipoteca-plazo-formato').textContent = (plazo / 12).toFixed(1) + ' años';
+            
+            if (monto > 0 && tasa > 0 && plazo > 0) {
+                const montoFinanciar = monto - inicial;
+                const tasaMensual = tasa / 100 / 12;
+                const cuotaMensual = montoFinanciar * (tasaMensual * Math.pow(1 + tasaMensual, plazo)) / 
+                                    (Math.pow(1 + tasaMensual, plazo) - 1);
+                const totalPagar = cuotaMensual * plazo;
+                const interesTotal = totalPagar - montoFinanciar;
+                
+                document.getElementById('hipoteca-financiar').textContent = formatCurrency(montoFinanciar);
+                document.getElementById('hipoteca-cuota').textContent = formatCurrency(cuotaMensual);
+                document.getElementById('hipoteca-total').textContent = formatCurrency(totalPagar);
+                document.getElementById('hipoteca-intereses').textContent = formatCurrency(interesTotal);
+                document.getElementById('hipoteca-inicial-sum').textContent = formatCurrency(inicial);
+                document.getElementById('hipoteca-financiar-sum').textContent = formatCurrency(montoFinanciar);
+                document.getElementById('hipoteca-intereses-sum').textContent = formatCurrency(interesTotal);
+            }
+        }
+
+        // Calcular Inversión
+        function calcularInversion() {
+            const montoInicial = parseFloat(document.getElementById('inversion-inicial').value) || 0;
+            const aporteMensual = parseFloat(document.getElementById('inversion-mensual').value) || 0;
+            const tasaAnual = parseFloat(document.getElementById('inversion-tasa').value) || 0;
+            const plazoAnios = parseInt(document.getElementById('inversion-plazo').value) || 0;
+            
+            // Actualizar formatos
+            document.getElementById('inversion-inicial-formato').textContent = formatCurrency(montoInicial);
+            document.getElementById('inversion-mensual-formato').textContent = formatCurrency(aporteMensual) + '/mes';
+            document.getElementById('inversion-plazo-formato').textContent = (plazoAnios * 12) + ' meses';
+            
+            if (montoInicial >= 0 && aporteMensual >= 0 && tasaAnual > 0 && plazoAnios > 0) {
+                const tasaMensual = tasaAnual / 100 / 12;
+                const meses = plazoAnios * 12;
+                
+                // Valor futuro del monto inicial
+                const vfInicial = montoInicial * Math.pow(1 + tasaMensual, meses);
+                
+                // Valor futuro de las aportaciones mensuales
+                const vfAportes = aporteMensual * ((Math.pow(1 + tasaMensual, meses) - 1) / tasaMensual);
+                
+                const valorFinal = vfInicial + vfAportes;
+                const totalAportado = montoInicial + (aporteMensual * meses);
+                const ganancias = valorFinal - totalAportado;
+                const rendimiento = totalAportado > 0 ? ((ganancias / totalAportado) * 100) : 0;
+                
+                document.getElementById('inversion-final').textContent = formatCurrency(valorFinal);
+                document.getElementById('inversion-aportado').textContent = formatCurrency(totalAportado);
+                document.getElementById('inversion-ganancias').textContent = formatCurrency(ganancias);
+                document.getElementById('inversion-rendimiento').textContent = rendimiento.toFixed(2) + '%';
+                document.getElementById('inversion-inicial-sum').textContent = formatCurrency(montoInicial);
+                document.getElementById('inversion-aportes-sum').textContent = formatCurrency(aporteMensual * meses);
+                document.getElementById('inversion-ganancias-sum').textContent = formatCurrency(ganancias);
+            }
+        }
+
+        // Calcular valores iniciales al cargar la página
+        window.onload = function() {
+            calcularConsumo();
+            calcularHipoteca();
+            calcularInversion();
+        };
+    </script>
+</body>
+</html>
